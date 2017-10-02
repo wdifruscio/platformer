@@ -8,17 +8,21 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 
 public class GameScreen extends ScreenAdapter {
-    private static final float WORLD_WIDTH = 640;
-    private static final float WORLD_HEIGHT = 480;
     private ShapeRenderer shapeRenderer;
     private Viewport viewport;
     private Camera camera;
     private SpriteBatch batch;
     private final Platformer platfomer;
+    private TiledMap tiledMap;
+    private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
+
 
     public GameScreen(Platformer platfomer) {
         this.platfomer = platfomer;
@@ -31,11 +35,14 @@ public class GameScreen extends ScreenAdapter {
     @Override
     public void show() {
         camera = new OrthographicCamera();
-        camera.position.set(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 0);
         camera.update();
-        viewport = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
+        viewport = new FitViewport(Constants.WORLD_WIDTH, Constants.WORLD_HEIGHT, camera);
+        viewport.apply(true);
         shapeRenderer = new ShapeRenderer();
         batch = new SpriteBatch();
+        tiledMap = platfomer.getAssetManager().get("platformer.tmx");
+        orthogonalTiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, batch);
+        orthogonalTiledMapRenderer.setView((OrthographicCamera) camera);
     }
 
     @Override
@@ -57,8 +64,7 @@ public class GameScreen extends ScreenAdapter {
     private void draw() {
         batch.setProjectionMatrix(camera.projection);
         batch.setTransformMatrix(camera.view);
-        batch.begin();
-        batch.end();
+        orthogonalTiledMapRenderer.render();
     }
 
     private void drawDebug() {

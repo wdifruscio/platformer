@@ -6,12 +6,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 
 public class LoadingScreen extends ScreenAdapter {
-    private static final float WORLD_WIDTH = 640;
-    private static final float WORLD_HEIGHT = 480;
     private static final float PROGRESS_BAR_WIDTH = 100;
     private static final float PROGRESS_BAR_HEIGHT = 25;
     private ShapeRenderer shapeRenderer;
@@ -32,10 +32,11 @@ public class LoadingScreen extends ScreenAdapter {
 
     public void show() {
         camera = new OrthographicCamera();
-        camera.position.set(WORLD_WIDTH, WORLD_HEIGHT, 0);
+        camera.position.set(Constants.WORLD_WIDTH, Constants.WORLD_HEIGHT, 0);
         camera.update();
-        viewport = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
+        viewport = new FitViewport(Constants.WORLD_WIDTH, Constants.WORLD_HEIGHT, camera);
         shapeRenderer = new ShapeRenderer();
+        platformer.getAssetManager().load("platformer.tmx", TiledMap.class);
     }
 
     @Override
@@ -68,7 +69,7 @@ public class LoadingScreen extends ScreenAdapter {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.WHITE);
         shapeRenderer.rect(
-                (WORLD_WIDTH  - PROGRESS_BAR_WIDTH) / 2, WORLD_HEIGHT / 2 - PROGRESS_BAR_HEIGHT / 2,
+                (Constants.WORLD_WIDTH  - PROGRESS_BAR_WIDTH) / 2, Constants.WORLD_HEIGHT / 2 - PROGRESS_BAR_HEIGHT / 2,
                 progress * PROGRESS_BAR_WIDTH, PROGRESS_BAR_HEIGHT);
         shapeRenderer.end();
     }
