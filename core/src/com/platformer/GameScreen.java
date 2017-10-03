@@ -2,10 +2,7 @@ package com.platformer;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -23,6 +20,7 @@ public class GameScreen extends ScreenAdapter {
     private TiledMap tiledMap;
     private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
     private Player player;
+    private Texture playerTexture;
 
     public GameScreen(Platformer platfomer) {
         this.platfomer = platfomer;
@@ -44,7 +42,8 @@ public class GameScreen extends ScreenAdapter {
 
         orthogonalTiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, batch);
         orthogonalTiledMapRenderer.setView((OrthographicCamera) camera);
-        player = new Player();
+        playerTexture = platfomer.getAssetManager().get("pete.png");
+        player = new Player(playerTexture);
 
     }
 
@@ -53,7 +52,7 @@ public class GameScreen extends ScreenAdapter {
         update(delta);
         clearScreen();
         draw();
-        drawDebug();
+//        drawDebug();
     }
 
     private void update(float delta) {
@@ -70,6 +69,9 @@ public class GameScreen extends ScreenAdapter {
         batch.setProjectionMatrix(camera.projection);
         batch.setTransformMatrix(camera.view);
         orthogonalTiledMapRenderer.render();
+        batch.begin();
+        player.draw(batch);
+        batch.end();
     }
 
     private void drawDebug() {
@@ -84,8 +86,8 @@ public class GameScreen extends ScreenAdapter {
         if(player.getX() < 0) {
             player.setPosition(0, player.getY());
         }
-        if(player.getY() < 0) {
-            player.setPosition(player.getX(), 0);
+        if(player.getY() <= 100) {
+            player.setPosition(player.getX(), 100);
         }
         if(player.getX() + Player.WIDTH > Constants.WORLD_WIDTH) {
             player.setPosition(Constants.WORLD_WIDTH - Player.WIDTH, player.getY());
