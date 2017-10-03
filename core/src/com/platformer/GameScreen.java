@@ -22,7 +22,7 @@ public class GameScreen extends ScreenAdapter {
     private final Platformer platfomer;
     private TiledMap tiledMap;
     private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
-
+    private Player player;
 
     public GameScreen(Platformer platfomer) {
         this.platfomer = platfomer;
@@ -41,8 +41,11 @@ public class GameScreen extends ScreenAdapter {
         shapeRenderer = new ShapeRenderer();
         batch = new SpriteBatch();
         tiledMap = platfomer.getAssetManager().get("platformer.tmx");
+
         orthogonalTiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, batch);
         orthogonalTiledMapRenderer.setView((OrthographicCamera) camera);
+        player = new Player();
+
     }
 
     @Override
@@ -54,6 +57,8 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void update(float delta) {
+        checkBoundaries();
+        player.update(delta);
     }
 
     private void clearScreen() {
@@ -71,6 +76,19 @@ public class GameScreen extends ScreenAdapter {
         shapeRenderer.setProjectionMatrix(camera.projection);
         shapeRenderer.setTransformMatrix(camera.view);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        player.drawDebug(shapeRenderer);
         shapeRenderer.end();
+    }
+
+    private void checkBoundaries() {
+        if(player.getX() < 0) {
+            player.setPosition(0, player.getY());
+        }
+        if(player.getY() < 0) {
+            player.setPosition(player.getX(), 0);
+        }
+        if(player.getX() + Player.WIDTH > Constants.WORLD_WIDTH) {
+            player.setPosition(Constants.WORLD_WIDTH - Player.WIDTH, player.getY());
+        }
     }
 }
