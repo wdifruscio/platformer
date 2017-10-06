@@ -26,7 +26,6 @@ public class Player {
 
     private boolean canJump = true;
     private boolean isJumping = false;
-    private float jumpYDistance = 0;
     private static final float MAX_JUMP_DISTANCE = 3 * HEIGHT;
 
     private float animationTimer = 0;
@@ -34,6 +33,10 @@ public class Player {
     private final Animation<TextureRegion> standing;
     private final Animation<TextureRegion> jumpUp;
     private final Animation<TextureRegion> jumpDown;
+
+    enum AnimationStates {
+        WALKING, STANDING, JUMP_UP, JUMP_DOWN
+    }
 
     public Player(Texture texture) {
         TextureRegion[] tmp = TextureRegion.split(texture, WIDTH, HEIGHT)[0];
@@ -44,14 +47,16 @@ public class Player {
         }
 
 
-        walking = new Animation<TextureRegion>(0.25F, regions);
-        standing = new Animation<TextureRegion>(0.25F, regions[0], regions[0]);
-        jumpUp = new Animation<TextureRegion>(0.25F, regions[2], regions[2]);
-        jumpDown = new Animation<TextureRegion>(0.25F, regions[3], regions[3]);
+        walking = new Animation<TextureRegion>(0.1f, regions);
+        standing = new Animation<TextureRegion>(0.1F, regions[0], regions[0]);
+        jumpUp = new Animation<TextureRegion>(0.1F, regions[2], regions[2]);
+        jumpDown = new Animation<TextureRegion>(0.1F, regions[3], regions[3]);
         walking.setPlayMode(Animation.PlayMode.LOOP);
         standing.setPlayMode(Animation.PlayMode.LOOP);
         jumpUp.setPlayMode(Animation.PlayMode.LOOP);
         jumpDown.setPlayMode(Animation.PlayMode.LOOP);
+
+        animationTimer = 0;
     }
 
     public void update(float delta) {
@@ -73,11 +78,13 @@ public class Player {
         if (input.isKeyPressed(Input.Keys.UP) && canJump) {
             ySpeed = 5;
             canJump = false;
+            isJumping = true;
         }
         if (ySpeed >= -5){
             ySpeed -= GRAVITY;
         } else {
             canJump = true;
+            isJumping = false;
         }
 
     }
@@ -87,20 +94,25 @@ public class Player {
     }
 
     public void draw(SpriteBatch batch) {
-        TextureRegion toDraw = standing.getKeyFrame(animationTimer,true);
-        if (xSpeed != 0) {
-            toDraw = walking.getKeyFrame(animationTimer, true);
-        }
-        if (ySpeed > 0) {
-            toDraw = jumpUp.getKeyFrame(animationTimer, true);
-        } else if (ySpeed < 0) {
-            toDraw = jumpDown.getKeyFrame(animationTimer, true);
-        }
-
-        if (xSpeed < 0) {
-            if (!toDraw.isFlipX()) toDraw.flip(true,false);
-        } else if (xSpeed > 0) {
+        TextureRegion toDraw = null;
+        if(xSpeed > 0 && !isJumping) {
+            toDraw = walking.getKeyFrame(animationTimer,true);
             if (toDraw.isFlipX()) toDraw.flip(true,false);
+        }
+        else if(xSpeed < 0 && !isJumping) {
+            toDraw = walking.getKeyFrame(animationTimer, true);
+            if (!toDraw.isFlipX()) toDraw.flip(true, false);
+        }
+        else if(ySpeed > 0) {
+            toDraw = jumpUp.getKeyFrame(animationTimer,true);
+//            if (toDraw.isFlipX()) toDraw.flip(true, false);
+        }
+        else if(ySpeed < 0) {
+            toDraw = jumpDown.getKeyFrame(animationTimer,true);
+//            if (!toDraw.isFlipX()) toDraw.flip(true,false);
+        }
+        else {
+            toDraw = standing.getKeyFrame(0);
         }
 
         batch.draw(toDraw, x, y);
