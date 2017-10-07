@@ -14,19 +14,24 @@ import javax.xml.soap.Text;
 
 public class Player {
     private static final float MAX_X_SPEED = 2;
-    private static final float MAX_Y_SPEED = 2;
+    private static final float MAX_Y_SPEED = 1;
     private static final float GRAVITY = 0.1F;
     public static final int WIDTH = 16;
     public static final int HEIGHT = 15;
+    private static final float MAX_JUMP_DISTANCE = 5 * HEIGHT;
+    private boolean blockJump = false;
+    private float jumpYDistance = 0;
     private final Rectangle collisionRectangle = new Rectangle(0,0,WIDTH,HEIGHT);
     private float x = 0;
     private float y = 0;
     private float xSpeed = 0;
     private float ySpeed = 0;
 
+    private float jumpTimer = 0;
+
     private boolean canJump = true;
     private boolean isJumping = false;
-    private static final float MAX_JUMP_DISTANCE = 3 * HEIGHT;
+    private int lastDirectionPressed;
 
     private float animationTimer = 0;
     private final Animation<TextureRegion> walking;
@@ -34,18 +39,8 @@ public class Player {
     private final Animation<TextureRegion> jumpUp;
     private final Animation<TextureRegion> jumpDown;
 
-    enum AnimationStates {
-        WALKING, STANDING, JUMP_UP, JUMP_DOWN
-    }
-
     public Player(Texture texture) {
-        TextureRegion[] tmp = TextureRegion.split(texture, WIDTH, HEIGHT)[0];
-        TextureRegion[] regions = new TextureRegion[tmp.length];
-
-        for(int i = 0; i < tmp.length; i++) {
-            regions[i] = tmp[i];
-        }
-
+        TextureRegion[] regions = TextureRegion.split(texture, WIDTH, HEIGHT)[0];
 
         walking = new Animation<TextureRegion>(0.1f, regions);
         standing = new Animation<TextureRegion>(0.1F, regions[0], regions[0]);
@@ -61,33 +56,43 @@ public class Player {
 
     public void update(float delta) {
         Input input = Gdx.input;
-        if (input.isKeyPressed(Input.Keys.RIGHT)) xSpeed = MAX_X_SPEED;
-        else if (input.isKeyPressed(Input.Keys.LEFT)) xSpeed = -MAX_X_SPEED;
+        if (input.isKeyPressed(Input.Keys.RIGHT)) {
+            lastDirectionPressed = Input.Keys.RIGHT;
+            xSpeed = MAX_X_SPEED;
+        }
+        else if (input.isKeyPressed(Input.Keys.LEFT)) {
+            lastDirectionPressed = Input.Keys.LEFT;
+            xSpeed = -MAX_X_SPEED;
+        }
         else xSpeed = 0;
-        jump(input, delta);
+
+        if (input.isKeyPressed(Input.Keys.UP) && !blockJump) {
+            ySpeed = MAX_Y_SPEED * 5;
+            blockJump = true;
+        }
+
+        if(jumpTimer >= 2f && blockJump) {
+            landed();
+        }
+
+        ySpeed -= 0.2;
 
         x += xSpeed;
         y += ySpeed;
         animationTimer += delta;
+        jumpTimer += delta;
         updateCollisionRectangle();
     }
 
     //rudimentary jump -> check if input is pressed, flip boolean and add speed to y,
     // apply gravity while y is large, when its not flip back to true
-    private void jump(Input input, float delta) {
-        if (input.isKeyPressed(Input.Keys.UP) && canJump) {
-            ySpeed = 5;
-            canJump = false;
-            isJumping = true;
-        }
-        if (ySpeed >= -5){
-            ySpeed -= GRAVITY;
-        } else {
-            canJump = true;
-            isJumping = false;
-        }
-
+    public void landed() {
+        jumpTimer=0;
+        blockJump = false;
+        ySpeed = 0;
     }
+
+
 
     public void drawDebug(ShapeRenderer shapeRenderer) {
         shapeRenderer.rect(collisionRectangle.x, collisionRectangle.y, collisionRectangle.width, collisionRectangle.height);
@@ -97,22 +102,25 @@ public class Player {
         TextureRegion toDraw = null;
         if(xSpeed > 0 && !isJumping) {
             toDraw = walking.getKeyFrame(animationTimer,true);
-            if (toDraw.isFlipX()) toDraw.flip(true,false);
         }
         else if(xSpeed < 0 && !isJumping) {
             toDraw = walking.getKeyFrame(animationTimer, true);
-            if (!toDraw.isFlipX()) toDraw.flip(true, false);
         }
         else if(ySpeed > 0) {
             toDraw = jumpUp.getKeyFrame(animationTimer,true);
-//            if (toDraw.isFlipX()) toDraw.flip(true, false);
         }
         else if(ySpeed < 0) {
             toDraw = jumpDown.getKeyFrame(animationTimer,true);
-//            if (!toDraw.isFlipX()) toDraw.flip(true,false);
         }
         else {
             toDraw = standing.getKeyFrame(0);
+        }
+
+        if(lastDirectionPressed == Input.Keys.RIGHT) {
+            if (toDraw.isFlipX()) toDraw.flip(true,false);
+        }
+        if(lastDirectionPressed == Input.Keys.LEFT) {
+            if (!toDraw.isFlipX()) toDraw.flip(true,false);
         }
 
         batch.draw(toDraw, x, y);
@@ -134,5 +142,9 @@ public class Player {
 
     public float getY() {
         return y;
+    }
+
+    public Rectangle getCollisionRectangle() {
+        return collisionRectangle;
     }
 }

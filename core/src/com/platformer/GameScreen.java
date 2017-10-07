@@ -6,10 +6,17 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
+import org.w3c.dom.css.Rect;
+
+import java.util.Iterator;
 
 public class GameScreen extends ScreenAdapter {
     private ShapeRenderer shapeRenderer;
@@ -21,6 +28,8 @@ public class GameScreen extends ScreenAdapter {
     private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
     private Player player;
     private Texture playerTexture;
+
+    private final int CELL_SIZE = 16;
 
     public GameScreen(Platformer platfomer) {
         this.platfomer = platfomer;
@@ -57,6 +66,7 @@ public class GameScreen extends ScreenAdapter {
 
     private void update(float delta) {
         checkBoundaries();
+        handleCollisions();
         player.update(delta);
     }
 
@@ -85,12 +95,96 @@ public class GameScreen extends ScreenAdapter {
     private void checkBoundaries() {
         if(player.getX() < 0) {
             player.setPosition(0, player.getY());
-        }
-        if(player.getY() <= 100) {
-            player.setPosition(player.getX(), 100);
+            player.landed();
         }
         if(player.getX() + Player.WIDTH > Constants.WORLD_WIDTH) {
             player.setPosition(Constants.WORLD_WIDTH - Player.WIDTH, player.getY());
+        }
+    }
+
+    private void handleCollisions() {
+        Array<CollisionCell> playerCells = whichCellDoesPlayerCover();
+        playerCells = filterOutNonTiledCells(playerCells);
+
+        for(CollisionCell cell : playerCells) {
+            float cellLevelX = cell.cellX * CELL_SIZE;
+            float cellLevelY = cell.cellY * CELL_SIZE;
+            Rectangle intersection = new Rectangle();
+            Intersector.intersectRectangles(player.getCollisionRectangle(), new Rectangle(cellLevelX, cellLevelY, CELL_SIZE, CELL_SIZE), intersection);
+
+            if (intersection.getHeight() < intersection.getWidth()) {
+                player.setPosition(player.getX(), intersection.getY() + intersection.getHeight());
+                player.landed();
+            } else if (intersection.getWidth() < intersection.getHeight()) {
+                if (intersection.getX() == player.getX()) {
+                    player.setPosition(intersection.getX() + intersection.getWidth(), player.getY());
+                }
+                if (intersection.getX() > player.getX()) {
+                    player.setPosition(intersection.getX() - player.WIDTH, player.getY());
+                }
+            }
+        }
+    }
+
+    private Array<CollisionCell> whichCellDoesPlayerCover() {
+        float x = player.getX();
+        float y = player.getY();
+        Array<CollisionCell> cellsCovered = new Array<CollisionCell>();
+        float cellX = x / CELL_SIZE;
+        float cellY = y / CELL_SIZE;
+
+        int bottomLeftCellX = MathUtils.floor(cellX);
+        int bottomLeftCellY = MathUtils.floor(cellY);
+
+        TiledMapTileLayer tiledMapTileLayer = (TiledMapTileLayer) tiledMap.getLayers().get(0);
+
+        cellsCovered.add(new CollisionCell(tiledMapTileLayer.getCell(bottomLeftCellX, bottomLeftCellY), bottomLeftCellX, bottomLeftCellY));
+
+        if (cellX % 1 != 0 && cellY % 1 != 0) {
+            int topRightCellX = bottomLeftCellX + 1;
+            int topRightCellY = bottomLeftCellY + 1;
+            cellsCovered.add(new CollisionCell(tiledMapTileLayer.getCell(topRightCellX, topRightCellY), topRightCellX, topRightCellY));
+        }
+
+        if (cellX % 1 != 0) {
+            int bottomRightCellX = bottomLeftCellX + 1;
+            int bottomRightCellY = bottomLeftCellY;
+            cellsCovered.add(new CollisionCell(tiledMapTileLayer.getCell(bottomRightCellX, bottomRightCellY), bottomRightCellX, bottomRightCellY));
+        }
+
+        if (cellY % 1 != 0) {
+            int topLeftCellX = bottomLeftCellX;
+            int topLeftCellY = bottomLeftCellY + 1;
+            cellsCovered.add(new CollisionCell(tiledMapTileLayer.getCell(topLeftCellX, topLeftCellY), topLeftCellX, topLeftCellY));
+        }
+
+        return cellsCovered;
+    }
+
+    private Array<CollisionCell> filterOutNonTiledCells(Array<CollisionCell> cells) {
+        for (Iterator<CollisionCell> iter = cells.iterator(); iter.hasNext(); ) {
+            CollisionCell collisionCell = iter.next();
+            if (collisionCell.isEmpty()) {
+                iter.remove();
+            }
+        }
+        return cells;
+    }
+
+
+    private class CollisionCell {
+        private final TiledMapTileLayer.Cell cell;
+        private final int cellX;
+        private final int cellY;
+
+        public CollisionCell(TiledMapTileLayer.Cell cell, int cellX, int cellY) {
+            this.cell = cell;
+            this.cellX = cellX;
+            this.cellY = cellY;
+        }
+
+        public boolean isEmpty() {
+            return cell == null;
         }
     }
 }
