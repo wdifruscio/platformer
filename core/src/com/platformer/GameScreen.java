@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -52,7 +53,8 @@ public class GameScreen extends ScreenAdapter {
         orthogonalTiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, batch);
         orthogonalTiledMapRenderer.setView((OrthographicCamera) camera);
         playerTexture = platfomer.getAssetManager().get("pete.png");
-        player = new Player(playerTexture);
+        TextureAtlas textureAtlas = platfomer.getAssetManager().get("textureatlas.txt");
+        player = new Player(playerTexture, textureAtlas);
 
     }
 

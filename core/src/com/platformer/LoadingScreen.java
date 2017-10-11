@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -38,6 +39,7 @@ public class LoadingScreen extends ScreenAdapter {
         viewport = new FitViewport(Constants.WORLD_WIDTH, Constants.WORLD_HEIGHT, camera);
         shapeRenderer = new ShapeRenderer();
         platformer.getAssetManager().load("platformer.tmx", TiledMap.class);
+        platformer.getAssetManager().load("textureatlas.txt", TextureAtlas.class);
         platformer.getAssetManager().load("pete.png", Texture.class);
     }
 

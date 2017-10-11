@@ -3,10 +3,7 @@ package com.platformer;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 
@@ -39,17 +36,18 @@ public class Player {
     private final Animation<TextureRegion> jumpUp;
     private final Animation<TextureRegion> jumpDown;
 
-    public Player(Texture texture) {
+    public Player(Texture texture, TextureAtlas textureAtlas) {
         TextureRegion[] regions = TextureRegion.split(texture, WIDTH, HEIGHT)[0];
 
-        walking = new Animation<TextureRegion>(0.1f, regions);
-        standing = new Animation<TextureRegion>(0.1F, regions[0], regions[0]);
-        jumpUp = new Animation<TextureRegion>(0.1F, regions[2], regions[2]);
-        jumpDown = new Animation<TextureRegion>(0.1F, regions[3], regions[3]);
+
+        walking = new Animation<TextureRegion>(0.1f, textureAtlas.findRegions("run"));
+        standing = new Animation<TextureRegion>(0.1F, textureAtlas.findRegions("idle"));
+        jumpUp = new Animation<TextureRegion>(0.1F, textureAtlas.findRegion("jump", 0));
+        jumpDown = new Animation<TextureRegion>(0.1F, textureAtlas.findRegion("jump", 3));
         walking.setPlayMode(Animation.PlayMode.LOOP);
         standing.setPlayMode(Animation.PlayMode.LOOP);
-        jumpUp.setPlayMode(Animation.PlayMode.LOOP);
-        jumpDown.setPlayMode(Animation.PlayMode.LOOP);
+        jumpUp.setPlayMode(Animation.PlayMode.NORMAL);
+        jumpDown.setPlayMode(Animation.PlayMode.NORMAL);
 
         animationTimer = 0;
     }
@@ -99,7 +97,7 @@ public class Player {
     }
 
     public void draw(SpriteBatch batch) {
-        TextureRegion toDraw = null;
+        TextureRegion toDraw = standing.getKeyFrame(animationTimer);
         if(xSpeed > 0 && !isJumping) {
             toDraw = walking.getKeyFrame(animationTimer,true);
         }
@@ -107,13 +105,13 @@ public class Player {
             toDraw = walking.getKeyFrame(animationTimer, true);
         }
         else if(ySpeed > 0) {
-            toDraw = jumpUp.getKeyFrame(animationTimer,true);
+            toDraw = jumpUp.getKeyFrame(animationTimer);
         }
-        else if(ySpeed < 0) {
-            toDraw = jumpDown.getKeyFrame(animationTimer,true);
+        else if(ySpeed < -1) {
+            toDraw = jumpDown.getKeyFrame(animationTimer);
         }
         else {
-            toDraw = standing.getKeyFrame(0);
+            toDraw = standing.getKeyFrame(animationTimer);
         }
 
         if(lastDirectionPressed == Input.Keys.RIGHT) {
