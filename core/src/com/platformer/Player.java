@@ -19,8 +19,8 @@ public class Player {
     private boolean blockJump = false;
     private float jumpYDistance = 0;
     private final Rectangle collisionRectangle = new Rectangle(0,0,WIDTH,HEIGHT);
-    private float x = 0;
-    private float y = 0;
+    private float x = 20;
+    private float y = 20;
     private float xSpeed = 0;
     private float ySpeed = 0;
 

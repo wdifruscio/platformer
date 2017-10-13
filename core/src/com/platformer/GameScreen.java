@@ -22,7 +22,7 @@ import java.util.Iterator;
 public class GameScreen extends ScreenAdapter {
     private ShapeRenderer shapeRenderer;
     private Viewport viewport;
-    private Camera camera;
+    private OrthographicCamera camera;
     private SpriteBatch batch;
     private final Platformer platfomer;
     private TiledMap tiledMap;
@@ -45,13 +45,14 @@ public class GameScreen extends ScreenAdapter {
         camera = new OrthographicCamera();
         camera.update();
         viewport = new FitViewport(Constants.WORLD_WIDTH, Constants.WORLD_HEIGHT, camera);
+
         viewport.apply(true);
         shapeRenderer = new ShapeRenderer();
         batch = new SpriteBatch();
         tiledMap = platfomer.getAssetManager().get("platformer.tmx");
 
         orthogonalTiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, batch);
-        orthogonalTiledMapRenderer.setView((OrthographicCamera) camera);
+        orthogonalTiledMapRenderer.setView(camera);
         playerTexture = platfomer.getAssetManager().get("pete.png");
         TextureAtlas textureAtlas = platfomer.getAssetManager().get("textureatlas.txt");
         player = new Player(playerTexture, textureAtlas);
@@ -70,6 +71,7 @@ public class GameScreen extends ScreenAdapter {
         checkBoundaries();
         handleCollisions();
         player.update(delta);
+        updateCameraX();
     }
 
     private void clearScreen() {
@@ -101,6 +103,11 @@ public class GameScreen extends ScreenAdapter {
         }
         if(player.getX() + Player.WIDTH > Constants.WORLD_WIDTH) {
             player.setPosition(Constants.WORLD_WIDTH - Player.WIDTH, player.getY());
+        }
+        TiledMapTileLayer tiledMapTileLayer = (TiledMapTileLayer) tiledMap.getLayers().get(0);
+        float levelWidth =  tiledMapTileLayer.getWidth() * tiledMapTileLayer.getTileWidth();
+        if (player.getX() + player.WIDTH > levelWidth) {
+            player.setPosition(levelWidth - player.WIDTH, player.getY());
         }
     }
 
@@ -187,6 +194,15 @@ public class GameScreen extends ScreenAdapter {
 
         public boolean isEmpty() {
             return cell == null;
+        }
+    }
+    private void updateCameraX() {
+        TiledMapTileLayer tiledMapTileLayer = (TiledMapTileLayer) tiledMap.getLayers().get(0);
+        float levelWidth = tiledMapTileLayer.getWidth() * tiledMapTileLayer.getTileWidth();
+        if ( (player.getX() > Constants.WORLD_WIDTH / 2f) && (player.getX() < (levelWidth - Constants.WORLD_WIDTH / 2f)) ) {
+            camera.position.set(player.getX(), camera.position.y, camera.position.z);
+            camera.update();
+            orthogonalTiledMapRenderer.setView(camera);
         }
     }
 }
