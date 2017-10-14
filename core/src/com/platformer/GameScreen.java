@@ -101,9 +101,6 @@ public class GameScreen extends ScreenAdapter {
             player.setPosition(0, player.getY());
             player.landed();
         }
-        if(player.getX() + Player.WIDTH > Constants.WORLD_WIDTH) {
-            player.setPosition(Constants.WORLD_WIDTH - Player.WIDTH, player.getY());
-        }
         TiledMapTileLayer tiledMapTileLayer = (TiledMapTileLayer) tiledMap.getLayers().get(0);
         float levelWidth =  tiledMapTileLayer.getWidth() * tiledMapTileLayer.getTileWidth();
         if (player.getX() + player.WIDTH > levelWidth) {
