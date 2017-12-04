@@ -40,6 +40,7 @@ public class LoadingScreen extends ScreenAdapter {
         shapeRenderer = new ShapeRenderer();
         platformer.getAssetManager().load("platformer.tmx", TiledMap.class);
         platformer.getAssetManager().load("textureatlas.txt", TextureAtlas.class);
+        platformer.getAssetManager().load("kenney_16x16.png", Texture.class);
         platformer.getAssetManager().load("pete.png", Texture.class);
     }
 

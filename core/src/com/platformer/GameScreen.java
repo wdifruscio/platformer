@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -29,6 +31,7 @@ public class GameScreen extends ScreenAdapter {
     private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
     private Player player;
     private Texture playerTexture;
+    private Array<Collectable> mushrooms = new Array<Collectable>();
 
     private final int CELL_SIZE = 16;
 
@@ -53,9 +56,10 @@ public class GameScreen extends ScreenAdapter {
 
         orthogonalTiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, batch);
         orthogonalTiledMapRenderer.setView(camera);
-        playerTexture = platfomer.getAssetManager().get("pete.png");
+        playerTexture = platfomer.getAssetManager().get("textureatlas.png");
         TextureAtlas textureAtlas = platfomer.getAssetManager().get("textureatlas.txt");
         player = new Player(playerTexture, textureAtlas);
+//        populateCollectables();
 
     }
 
@@ -85,6 +89,9 @@ public class GameScreen extends ScreenAdapter {
         orthogonalTiledMapRenderer.render();
         batch.begin();
         player.draw(batch);
+        for (Collectable collectable : mushrooms) {
+            collectable.draw(batch);
+        }
         batch.end();
     }
 
@@ -142,7 +149,7 @@ public class GameScreen extends ScreenAdapter {
         int bottomLeftCellX = MathUtils.floor(cellX);
         int bottomLeftCellY = MathUtils.floor(cellY);
 
-        TiledMapTileLayer tiledMapTileLayer = (TiledMapTileLayer) tiledMap.getLayers().get(0);
+        TiledMapTileLayer tiledMapTileLayer = (TiledMapTileLayer) tiledMap.getLayers().get(1);
 
         cellsCovered.add(new CollisionCell(tiledMapTileLayer.getCell(bottomLeftCellX, bottomLeftCellY), bottomLeftCellX, bottomLeftCellY));
 
@@ -176,6 +183,18 @@ public class GameScreen extends ScreenAdapter {
         }
         return cells;
     }
+
+//    private void populateCollectables() {
+//        MapLayer mapLayer = tiledMap.getLayers().get("Collectables");
+//        for (MapObject mapObject : mapLayer.getObjects()) {
+//            mushrooms.add(
+//                    new Collectable(platfomer.getAssetManager().get("kenney_16x16.png", Texture.class),
+//                            mapObject.getProperties().get("x", Integer.class),
+//                            mapObject.getProperties().get("y", Integer.class)
+//                    )
+//            );
+//        }
+//    }
 
 
     private class CollisionCell {
