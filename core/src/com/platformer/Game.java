@@ -4,7 +4,9 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.platformer.handlers.GameInput;
 import com.platformer.handlers.GameStateManager;
+import com.platformer.handlers.InputProcessor;
 
 public class Game implements ApplicationListener {
 
@@ -41,6 +43,9 @@ public class Game implements ApplicationListener {
 
     @Override
     public void create() {
+
+        Gdx.input.setInputProcessor(new InputProcessor());
+
         batch = new SpriteBatch();
         camera = new OrthographicCamera();
         hud = new OrthographicCamera();
@@ -63,6 +68,7 @@ public class Game implements ApplicationListener {
             accumulatedTime -= STEP;
             gsm.update(STEP);
             gsm.render();
+            GameInput.update();
         }
     }
 
