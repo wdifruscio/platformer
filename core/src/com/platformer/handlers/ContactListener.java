@@ -7,18 +7,18 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 
 public class ContactListener implements com.badlogic.gdx.physics.box2d.ContactListener{
 
-    private boolean canJump = false;
+    private int numOfContacts;
 
     @Override
     public void beginContact(Contact contact) {
         Fixture fa = contact.getFixtureA();
         Fixture fb = contact.getFixtureB();
 
-        if(fa.getUserData() != null && fa.getUserData().equals("feet")) {
-            canJump = true;
+        if(fa.getUserData().equals("feet")) {
+            numOfContacts++;
         }
-        if(fb.getUserData() != null && fb.getUserData().equals("feet")) {
-            canJump = true;
+        if(fb.getUserData().equals("feet")) {
+            numOfContacts++;
         }
     }
 
@@ -27,11 +27,11 @@ public class ContactListener implements com.badlogic.gdx.physics.box2d.ContactLi
         Fixture fa = contact.getFixtureA();
         Fixture fb = contact.getFixtureB();
 
-        if(fa.getUserData() != null && fa.getUserData().equals("feet")) {
-            canJump = false;
+        if(fa.getUserData().equals("feet")) {
+            numOfContacts--;
         }
-        if(fb.getUserData() != null && fb.getUserData().equals("feet")) {
-            canJump = false;
+        if(fb.getUserData().equals("feet")) {
+            numOfContacts--;
         }
 
     }
@@ -47,7 +47,7 @@ public class ContactListener implements com.badlogic.gdx.physics.box2d.ContactLi
     }
 
     public boolean canPlayerJump() {
-        return canJump;
+        return numOfContacts > 0;
     }
 
 }
