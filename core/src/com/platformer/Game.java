@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.platformer.handlers.GameInput;
 import com.platformer.handlers.GameStateManager;
 import com.platformer.handlers.InputProcessor;
+import com.platformer.handlers.ResourceManager;
 
 public class Game implements ApplicationListener {
 
@@ -22,29 +23,27 @@ public class Game implements ApplicationListener {
     private SpriteBatch batch;
     private OrthographicCamera camera;
     private OrthographicCamera hud;
-
     private GameStateManager gsm;
 
-
+    public static ResourceManager resourceManager;
 
     public SpriteBatch getBatch() {
         return batch;
     }
-
     public OrthographicCamera getCamera() {
         return camera;
     }
-
     public OrthographicCamera getHud() {
         return hud;
     }
-
-
 
     @Override
     public void create() {
 
         Gdx.input.setInputProcessor(new InputProcessor());
+
+        resourceManager = new ResourceManager();
+        resourceManager.loadTexture("textureatlas.png", "hi");
 
         batch = new SpriteBatch();
         camera = new OrthographicCamera();
