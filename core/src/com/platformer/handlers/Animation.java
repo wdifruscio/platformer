@@ -10,6 +10,7 @@ public class Animation {
     private float delay;
     private int currentFrame;
     private int timesPlayed;
+    public boolean shouldReset = false;
 
     TextureRegion[] frames;
 
@@ -40,11 +41,18 @@ public class Animation {
     }
 
     public void step() {
-        time-=delay;
-        currentFrame++;
-        if(currentFrame == frames.length) {
+        if(shouldReset) {
             currentFrame = 0;
-            timesPlayed++;
+            time = 0;
+            timesPlayed = 0;
+            shouldReset = false;
+        } else {
+            time-=delay;
+            currentFrame++;
+            if(currentFrame == frames.length) {
+                currentFrame = 0;
+                timesPlayed++;
+            }
         }
     }
 

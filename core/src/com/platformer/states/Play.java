@@ -66,14 +66,16 @@ public class Play extends GameState {
             }
         }
         if(GameInput.isDown(GameInput.RIGHT)) {
+            if(player.getAnimation().getFrame().isFlipX()) {
+                player.getAnimation().getFrame().flip(true, false);
+            }
             player.getBody().setTransform(player.getBody().getPosition().x +1 / PPM,  player.getBody().getPosition().y, 0 );
         }
         if(GameInput.isDown(GameInput.LEFT)) {
+            if(!player.getAnimation().getFrame().isFlipX()) {
+                player.getAnimation().getFrame().flip(true, false);
+            }
             player.getBody().setTransform(player.getBody().getPosition().x -1 / PPM,  player.getBody().getPosition().y, 0 );
-        }
-
-        if(player.getBody().get()) {
-            System.out.println(player.getBody().isActive() + "");
         }
     }
 

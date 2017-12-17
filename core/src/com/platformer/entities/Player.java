@@ -21,6 +21,7 @@ public class Player extends B2DSprite {
     public void setTextureRegion(String key) {
         if(key == "walking") {
             setAnimation(walkRegion, 1/12f);
+            setAnimation(walkRegion, 1/12f);
         }
     }
 

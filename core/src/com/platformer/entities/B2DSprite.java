@@ -14,7 +14,6 @@ public class B2DSprite {
     protected Animation animation;
     protected float width;
     protected float height;
-    protected boolean isFlipped = false;
 
     public B2DSprite(Body body) {
         this.body = body;
@@ -37,7 +36,6 @@ public class B2DSprite {
         sb.end();
     }
 
-    public void setIsFlipped(boolean flip) { this.isFlipped = flip; }
     public Body getBody() {return this.body;}
     public Vector2 getPosition() {return body.getPosition();}
     public float getWidth() { return width; }
