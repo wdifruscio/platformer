@@ -9,6 +9,7 @@ import com.platformer.handlers.GameStateManager;
 import com.platformer.handlers.InputProcessor;
 import com.platformer.handlers.ResourceManager;
 
+
 public class Game implements ApplicationListener {
 
     public static final String TITLE = "Platformer";
@@ -25,8 +26,6 @@ public class Game implements ApplicationListener {
     private OrthographicCamera hud;
     private GameStateManager gsm;
 
-    public static ResourceManager resourceManager;
-
     public SpriteBatch getBatch() {
         return batch;
     }
@@ -37,14 +36,11 @@ public class Game implements ApplicationListener {
         return hud;
     }
 
+    public static ResourceManager resources;
+
     @Override
     public void create() {
-
         Gdx.input.setInputProcessor(new InputProcessor());
-
-        resourceManager = new ResourceManager();
-        resourceManager.loadTexture("textureatlas.png", "hi");
-
         batch = new SpriteBatch();
         camera = new OrthographicCamera();
         hud = new OrthographicCamera();
@@ -52,6 +48,8 @@ public class Game implements ApplicationListener {
         camera.setToOrtho(false,WIDTH, HEIGHT);
         hud.setToOrtho(false, WIDTH, HEIGHT);
 
+        resources = new ResourceManager();
+        resources.loadTexture("penguin.png", "penguin");
         gsm = new GameStateManager(this);
     }
 
