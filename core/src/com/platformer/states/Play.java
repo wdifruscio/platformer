@@ -41,11 +41,14 @@ public class Play extends GameState {
 
     private Player player;
 
+    private int obstacles = 0;
+    float obstacleTime = 0;
+
     public Play(GameStateManager gsm) {
         super(gsm);
         //setup box2d
 
-        world=new World(new Vector2(0, -9.81f), true);
+        world = new World(new Vector2(0, -9.81f), true);
         cl = new ContactListener();
         world.setContactListener(cl);
         box2dDebug = new Box2DDebugRenderer();
@@ -70,9 +73,9 @@ public class Play extends GameState {
     @Override
     public void handleInput() {
 
-        if(GameInput.isPressed(GameInput.JUMP)) {
-            if(cl.canPlayerJump()) {
-                player.getBody().applyForceToCenter(0,200,true);
+        if (GameInput.isPressed(GameInput.JUMP)) {
+            if (cl.canPlayerJump()) {
+                player.getBody().applyForceToCenter(0, 200, true);
             }
         }
     }
@@ -82,16 +85,17 @@ public class Play extends GameState {
         handleInput();
         world.step(dt, 6, 2);
         player.update(dt);
-        for(int i = 0; i < bgs.length; i++) {
+        for (int i = 0; i < bgs.length; i++) {
             bgs[i].update(dt);
         }
+        createObstacle(dt);
     }
 
     @Override
     public void render() {
         Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
         //draw bgs
-        for(int i = 0; i < bgs.length; i++) {
+        for (int i = 0; i < bgs.length; i++) {
             bgs[i].render(batch);
         }
 
@@ -111,9 +115,9 @@ public class Play extends GameState {
 
     public void createPlayer() {
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(10 / PPM, 13/ PPM);
+        shape.setAsBox(10 / PPM, 13 / PPM);
         BodyDef bodyDef = new BodyDef();
-        bodyDef.position.set(50 / PPM,120/ PPM);
+        bodyDef.position.set(50 / PPM, 120 / PPM);
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         Body playerBody = world.createBody(bodyDef);
 
@@ -125,7 +129,7 @@ public class Play extends GameState {
         fixtureDef.friction = 0;
         playerBody.createFixture(fixtureDef).setUserData("player");
 
-        shape.setAsBox(2/PPM, 2/PPM, new Vector2(0, -13/PPM), 0);
+        shape.setAsBox(2 / PPM, 2 / PPM, new Vector2(0, -13 / PPM), 0);
         fixtureDef.isSensor = true;
         fixtureDef.filter.categoryBits = Box2DConstants.PLAYER_BIT;
         fixtureDef.filter.maskBits = Box2DConstants.GROUND_BIT;
@@ -150,17 +154,17 @@ public class Play extends GameState {
         BodyDef bodyDef = new BodyDef();
         FixtureDef fixtureDef = new FixtureDef();
         //create b2d bodies for each tile.
-        for(int row = 0; row < layer.getHeight(); row++) {
-            for(int col = 0; col < layer.getWidth(); col++) {
+        for (int row = 0; row < layer.getHeight(); row++) {
+            for (int col = 0; col < layer.getWidth(); col++) {
                 TiledMapTileLayer.Cell cell = layer.getCell(col, row);
-                if(cell == null || cell.getTile() == null) continue;
+                if (cell == null || cell.getTile() == null) continue;
                 bodyDef.type = BodyDef.BodyType.StaticBody;
                 bodyDef.position.set((col + 0.5f) * tileSize / PPM, (row + 0.5f) * tileSize / PPM);
                 ChainShape cshape = new ChainShape();
                 Vector2 verticies[] = {
                         new Vector2(-tileSize / 2 / PPM, -tileSize / 2 / PPM),
                         new Vector2(-tileSize / 2 / PPM, tileSize / 2 / PPM),
-                        new Vector2(tileSize / 2 / PPM, tileSize / 2 /PPM),
+                        new Vector2(tileSize / 2 / PPM, tileSize / 2 / PPM),
                 };
                 cshape.createChain(verticies);
                 fixtureDef.friction = 0;
@@ -172,5 +176,23 @@ public class Play extends GameState {
             }
         }
     }
-
+    public void createObstacle(float dt) {
+        obstacleTime+=dt;
+        if(obstacleTime > 1 && obstacles <= 0) {
+            obstacles++;
+            PolygonShape shape = new PolygonShape();
+            shape.setAsBox(10 / PPM, 13 / PPM);
+            BodyDef bodyDef = new BodyDef();
+            bodyDef.position.set(320 / PPM, 64 / PPM);
+            bodyDef.type = BodyDef.BodyType.DynamicBody;
+            Body body = world.createBody(bodyDef);
+            body.setLinearVelocity(-1, 0);
+            FixtureDef fixtureDef = new FixtureDef();
+            fixtureDef.filter.categoryBits = Box2DConstants.PLAYER_BIT;
+            fixtureDef.filter.maskBits = Box2DConstants.GROUND_BIT;
+            fixtureDef.shape = shape;
+            fixtureDef.friction = 0;
+            body.createFixture(fixtureDef).setUserData("obs");
+        }
+    }
 }
