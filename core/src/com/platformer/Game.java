@@ -50,6 +50,7 @@ public class Game implements ApplicationListener {
 
         resources = new ResourceManager();
         resources.loadTexture("penguin.png", "penguin");
+        resources.loadTexture("bgs.png", "bg");
         gsm = new GameStateManager(this);
     }
 

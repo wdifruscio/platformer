@@ -3,7 +3,9 @@ package com.platformer.states;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -12,11 +14,10 @@ import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.platformer.Game;
+import com.platformer.entities.Background;
 import com.platformer.entities.Player;
-import com.platformer.handlers.Box2DConstants;
+import com.platformer.handlers.*;
 import com.platformer.handlers.ContactListener;
-import com.platformer.handlers.GameInput;
-import com.platformer.handlers.GameStateManager;
 
 import static com.platformer.handlers.Box2DConstants.GROUND_BIT;
 import static com.platformer.handlers.Box2DConstants.PLAYER_BIT;
@@ -36,6 +37,7 @@ public class Play extends GameState {
 
     private TiledMap tiledMap;
     private OrthogonalTiledMapRenderer tilemapRenderer;
+    private Background[] bgs = new Background[3];
 
     private Player player;
 
@@ -49,10 +51,19 @@ public class Play extends GameState {
         box2dDebug = new Box2DDebugRenderer();
         box2dCam = new OrthographicCamera();
         box2dCam.setToOrtho(false, Game.WIDTH / PPM, Game.HEIGHT / PPM);
-
         //create player and tiles
-        createPlayer();
+        Texture bg = Game.resources.getTexture("bg");
+        TextureRegion sky = new TextureRegion(bg, 0, 0, 320, 240);
+        TextureRegion clouds = new TextureRegion(bg, 0, 240, 320, 240);
+        TextureRegion mountains = new TextureRegion(bg, 0, 480, 320, 240);
+
+        bgs[0] = new Background(sky, camera, 5f);
+        bgs[1] = new Background(clouds, camera, 4f);
+        bgs[2] = new Background(mountains, camera, 3f);
+
         createTiles();
+        createPlayer();
+//        player.getBody().setLinearVelocity(1, 0);
 
     }
 
@@ -60,22 +71,9 @@ public class Play extends GameState {
     public void handleInput() {
 
         if(GameInput.isPressed(GameInput.JUMP)) {
-//            System.out.println("canjump" + cl.canPlayerJump());
             if(cl.canPlayerJump()) {
                 player.getBody().applyForceToCenter(0,200,true);
             }
-        }
-        if(GameInput.isDown(GameInput.RIGHT)) {
-            if(player.getAnimation().getFrame().isFlipX()) {
-                player.getAnimation().getFrame().flip(true, false);
-            }
-            player.getBody().setTransform(player.getBody().getPosition().x +1 / PPM,  player.getBody().getPosition().y, 0 );
-        }
-        if(GameInput.isDown(GameInput.LEFT)) {
-            if(!player.getAnimation().getFrame().isFlipX()) {
-                player.getAnimation().getFrame().flip(true, false);
-            }
-            player.getBody().setTransform(player.getBody().getPosition().x -1 / PPM,  player.getBody().getPosition().y, 0 );
         }
     }
 
@@ -84,16 +82,24 @@ public class Play extends GameState {
         handleInput();
         world.step(dt, 6, 2);
         player.update(dt);
+        for(int i = 0; i < bgs.length; i++) {
+            bgs[i].update(dt);
+        }
     }
 
     @Override
     public void render() {
-
         Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
+        //draw bgs
+        for(int i = 0; i < bgs.length; i++) {
+            bgs[i].render(batch);
+        }
+
         //draw map
         tilemapRenderer.setView(camera);
         tilemapRenderer.render();
         batch.setProjectionMatrix(camera.combined);
+
         player.render(batch);
         box2dDebug.render(world, box2dCam.combined);
     }
@@ -105,9 +111,9 @@ public class Play extends GameState {
 
     public void createPlayer() {
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(13 / PPM, 13/ PPM);
+        shape.setAsBox(10 / PPM, 13/ PPM);
         BodyDef bodyDef = new BodyDef();
-        bodyDef.position.set(160 / PPM,120/ PPM);
+        bodyDef.position.set(50 / PPM,120/ PPM);
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         Body playerBody = world.createBody(bodyDef);
 
