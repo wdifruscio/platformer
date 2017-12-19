@@ -14,16 +14,6 @@ public class Player extends B2DSprite {
         Texture texture = Game.resources.getTexture("penguin");
         walkRegion = TextureRegion.split(texture, 32, 32)[1];
 //        idle = TextureRegion.split(texture, 32,32)[0];
-        setAnimation(walkRegion, 1/12f);
-
+        setAnimation(walkRegion, 1/10f);
     }
-
-    public void setTextureRegion(String key) {
-        if(key == "walking") {
-            setAnimation(walkRegion, 1/12f);
-            setAnimation(walkRegion, 1/12f);
-        }
-    }
-
-
 }
