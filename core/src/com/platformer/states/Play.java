@@ -13,8 +13,10 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.Array;
 import com.platformer.Game;
 import com.platformer.entities.Background;
+import com.platformer.entities.Obstacle;
 import com.platformer.entities.Player;
 import com.platformer.handlers.*;
 import com.platformer.handlers.ContactListener;
@@ -41,7 +43,7 @@ public class Play extends GameState {
 
     private Player player;
 
-    private int obstacles = 0;
+    private Array<Obstacle> obstacles = new Array<Obstacle>();
     float obstacleTime = 0;
 
     public Play(GameStateManager gsm) {
@@ -89,6 +91,7 @@ public class Play extends GameState {
             bgs[i].update(dt);
         }
         createObstacle(dt);
+        removeObstacles();
     }
 
     @Override
@@ -105,6 +108,12 @@ public class Play extends GameState {
         batch.setProjectionMatrix(camera.combined);
 
         player.render(batch);
+        if(obstacles.size >= 0 ) {
+            for(Obstacle o : obstacles) {
+                o.render(batch);
+            }
+        }
+
         box2dDebug.render(world, box2dCam.combined);
     }
 
@@ -176,10 +185,10 @@ public class Play extends GameState {
             }
         }
     }
+
     public void createObstacle(float dt) {
         obstacleTime+=dt;
-        if(obstacleTime > 1 && obstacles <= 0) {
-            obstacles++;
+        if(obstacleTime > 1 && obstacles.size < 1) {
             PolygonShape shape = new PolygonShape();
             shape.setAsBox(10 / PPM, 13 / PPM);
             BodyDef bodyDef = new BodyDef();
@@ -193,6 +202,20 @@ public class Play extends GameState {
             fixtureDef.shape = shape;
             fixtureDef.friction = 0;
             body.createFixture(fixtureDef).setUserData("obs");
+
+            Obstacle obs = new Obstacle(body);
+            obstacles.add(obs);
+            obstacleTime=0;
+        }
+    }
+
+    public void removeObstacles() {
+        for(int i = 0; i < obstacles.size; i++) {
+            if(obstacles.get(i).getPosition().x <= 0) {
+                world.destroyBody(obstacles.get(i).getBody());
+                obstacles.removeIndex(i);
+                System.out.printf("yo");
+            }
         }
     }
 }
