@@ -21,7 +21,7 @@ public class ContactListener implements com.badlogic.gdx.physics.box2d.ContactLi
             numOfContacts++;
         }
 
-        if(fa.getUserData().equals("player_front") && fb.getUserData().equals("obs_front")) {
+        if(fa.getUserData().equals("player_front")) {
             System.out.printf("collision");
         }
 

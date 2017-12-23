@@ -203,14 +203,14 @@ public class Play extends GameState {
             Body body = world.createBody(bodyDef);
             body.setLinearVelocity(-1, 0);
             FixtureDef fixtureDef = new FixtureDef();
-            fixtureDef.filter.categoryBits = Box2DConstants.PLAYER_BIT;
-            fixtureDef.filter.maskBits = Box2DConstants.GROUND_BIT;
+            fixtureDef.filter.categoryBits = -1;
+            fixtureDef.filter.maskBits = -1;
             fixtureDef.shape = shape;
             fixtureDef.friction = 0;
             body.createFixture(fixtureDef).setUserData("obs");
 
-            shape.setAsBox(11 / PPM, 13 / PPM, new Vector2(0, 0 / PPM), 0);
             fixtureDef.isSensor = true;
+            shape.setAsBox(11 / PPM, 13 / PPM, new Vector2(-5 / PPM, 5 / PPM), 0);
             fixtureDef.shape = shape;
             body.createFixture(fixtureDef).setUserData("obs_front");
 
