@@ -145,6 +145,12 @@ public class Play extends GameState {
         fixtureDef.shape = shape;
         playerBody.createFixture(fixtureDef).setUserData("feet");
 
+
+        shape.setAsBox(2 / PPM, 2 / PPM, new Vector2(10 / PPM, 2 / PPM), 0);
+        fixtureDef.isSensor = true;
+        fixtureDef.shape = shape;
+        playerBody.createFixture(fixtureDef).setUserData("player_front");
+
         player = new Player(playerBody);
 
     }
@@ -202,6 +208,11 @@ public class Play extends GameState {
             fixtureDef.shape = shape;
             fixtureDef.friction = 0;
             body.createFixture(fixtureDef).setUserData("obs");
+
+            shape.setAsBox(11 / PPM, 13 / PPM, new Vector2(0, 0 / PPM), 0);
+            fixtureDef.isSensor = true;
+            fixtureDef.shape = shape;
+            body.createFixture(fixtureDef).setUserData("obs_front");
 
             Obstacle obs = new Obstacle(body);
             obstacles.add(obs);
