@@ -7,10 +7,10 @@ import com.platformer.Game;
 
 public class Obstacle extends B2DSprite {
     TextureRegion[] walkRegion;
-    public Obstacle(Body body) {
+    public Obstacle(Body body, String tex) {
         super(body);
-        Texture texture = Game.resources.getTexture("penguin");
-        walkRegion = TextureRegion.split(texture, 32, 32)[1];
-        setAnimation(walkRegion, 1/10f);
+        Texture texture = Game.resources.getTexture(tex);
+        walkRegion = TextureRegion.split(texture, 32, 32)[0];
+        setAnimation(walkRegion, 1/15f);
     }
 }

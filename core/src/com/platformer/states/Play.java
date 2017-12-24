@@ -135,7 +135,7 @@ public class Play extends GameState {
         }
         score.draw(batch);
 
-        box2dDebug.render(world, box2dCam.combined);
+//        box2dDebug.render(world, box2dCam.combined);
     }
 
     @Override
@@ -145,7 +145,7 @@ public class Play extends GameState {
 
     public void createPlayer() {
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(10 / PPM, 13 / PPM);
+        shape.setAsBox(8 / PPM, 12 / PPM);
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(50 / PPM, 120 / PPM);
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -213,27 +213,51 @@ public class Play extends GameState {
     public void createObstacle(float dt) {
         obstacleTime+=dt;
         if(obstacleTime > 1 && obstacles.size < 1) {
+
+            double chance = Math.random();
             PolygonShape shape = new PolygonShape();
-            shape.setAsBox(10 / PPM, 13 / PPM);
             BodyDef bodyDef = new BodyDef();
-            bodyDef.position.set(320 / PPM, 64 / PPM);
-            bodyDef.type = BodyDef.BodyType.DynamicBody;
-            Body body = world.createBody(bodyDef);
-            body.setLinearVelocity(-1, 0);
             FixtureDef fixtureDef = new FixtureDef();
-            fixtureDef.filter.categoryBits = -1;
-            fixtureDef.filter.maskBits = -1;
-            fixtureDef.shape = shape;
-            fixtureDef.friction = 0;
-            body.createFixture(fixtureDef).setUserData("obs");
 
-            fixtureDef.isSensor = true;
-            shape.setAsBox(11 / PPM, 13 / PPM, new Vector2(-2 / PPM, 0 / PPM), 0);
-            fixtureDef.shape = shape;
-            body.createFixture(fixtureDef).setUserData("obs_front");
+            if(chance > 0.5) {
+                shape.setAsBox(10 / PPM, 11 / PPM);
+                bodyDef.position.set(320 / PPM, 64 / PPM);
+                bodyDef.type = BodyDef.BodyType.DynamicBody;
+                Body body = world.createBody(bodyDef);
+                body.setLinearVelocity(-1, 0);
 
-            Obstacle obs = new Obstacle(body);
-            obstacles.add(obs);
+                fixtureDef.filter.categoryBits = -1;
+                fixtureDef.filter.maskBits = -1;
+                fixtureDef.shape = shape;
+                fixtureDef.friction = 0;
+                body.createFixture(fixtureDef).setUserData("obs");
+
+                fixtureDef.isSensor = true;
+                shape.setAsBox(11 / PPM, 9 / PPM, new Vector2(-2 / PPM, 0 / PPM), 0);
+                fixtureDef.shape = shape;
+                body.createFixture(fixtureDef).setUserData("obs_front");
+                Obstacle obs = new Obstacle(body, "fox");
+                obstacles.add(obs);
+            } else {
+                shape.setAsBox(10 / PPM, 13 / PPM);
+                bodyDef.position.set(320 / PPM, 66 / PPM);
+                bodyDef.type = BodyDef.BodyType.DynamicBody;
+                Body body = world.createBody(bodyDef);
+                body.setLinearVelocity(-1, 0);
+                body.setGravityScale(0);
+                fixtureDef.filter.categoryBits = -1;
+                fixtureDef.filter.maskBits = -1;
+                fixtureDef.shape = shape;
+                fixtureDef.friction = 0;
+                body.createFixture(fixtureDef).setUserData("obs");
+
+                fixtureDef.isSensor = true;
+                shape.setAsBox(11 / PPM, 13 / PPM, new Vector2(-2 / PPM, 0 / PPM), 0);
+                fixtureDef.shape = shape;
+                body.createFixture(fixtureDef).setUserData("obs_front");
+                Obstacle obs = new Obstacle(body, "bat");
+                obstacles.add(obs);
+            }
             obstacleTime=0;
         }
     }
