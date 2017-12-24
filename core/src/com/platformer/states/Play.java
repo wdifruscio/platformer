@@ -18,6 +18,7 @@ import com.platformer.Game;
 import com.platformer.entities.Background;
 import com.platformer.entities.Obstacle;
 import com.platformer.entities.Player;
+import com.platformer.entities.Score;
 import com.platformer.handlers.*;
 import com.platformer.handlers.ContactListener;
 
@@ -42,6 +43,7 @@ public class Play extends GameState {
     private Background[] bgs = new Background[3];
 
     private Player player;
+    private Score score;
 
     private Array<Obstacle> obstacles = new Array<Obstacle>();
     float obstacleTime = 0;
@@ -65,6 +67,8 @@ public class Play extends GameState {
         bgs[0] = new Background(sky, camera, 5f);
         bgs[1] = new Background(clouds, camera, 4f);
         bgs[2] = new Background(mountains, camera, 3f);
+
+        score = new Score();
 
         createTiles();
         createPlayer();
@@ -92,6 +96,7 @@ public class Play extends GameState {
         }
         createObstacle(dt);
         removeObstacles();
+        score.update(dt);
     }
 
     @Override
@@ -113,6 +118,7 @@ public class Play extends GameState {
                 o.render(batch);
             }
         }
+        score.draw(batch);
 
         box2dDebug.render(world, box2dCam.combined);
     }
