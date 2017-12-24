@@ -25,11 +25,11 @@ public class Animation {
     }
 
     public void setFrames(TextureRegion[] frames, float delay) {
+        timesPlayed = 0;
         this.frames = frames;
         this.delay = delay;
         time = 0;
         currentFrame = 0;
-        timesPlayed = 0;
     }
 
     public void update(float dt) {
@@ -41,23 +41,16 @@ public class Animation {
     }
 
     public void step() {
-        if(shouldReset) {
+        time-=delay;
+        currentFrame++;
+        if(currentFrame == frames.length) {
             currentFrame = 0;
-            time = 0;
-            timesPlayed = 0;
-            shouldReset = false;
-        } else {
-            time-=delay;
-            currentFrame++;
-            if(currentFrame == frames.length) {
-                currentFrame = 0;
-                timesPlayed++;
-            }
+            timesPlayed++;
         }
     }
 
     public TextureRegion getFrame() {
         return frames[currentFrame];
     }
-    public int getTimesPlayed(){ return timesPlayed; };
+    public int getTimesPlayed(){ return timesPlayed; }
 }

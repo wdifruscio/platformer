@@ -41,6 +41,7 @@ public class Play extends GameState {
     private TiledMap tiledMap;
     private OrthogonalTiledMapRenderer tilemapRenderer;
     private Background[] bgs = new Background[3];
+    private boolean shouldPauseAnimation = false;
 
     private Player player;
     private Score score;
@@ -84,6 +85,15 @@ public class Play extends GameState {
                 player.getBody().applyForceToCenter(0, 200, true);
             }
         }
+        if(GameInput.isDown(GameInput.DOWN)) {
+            shouldPauseAnimation = true;
+            player.setIsDodging(true);
+            player.getBody().setTransform(player.getPosition().x, player.getPosition().y + 0.1f / PPM, (float) (-90f * (Math.PI / 180f)));
+        } else {
+            shouldPauseAnimation = false;
+            player.setIsDodging(false);
+            player.getBody().setTransform(player.getPosition().x, player.getPosition().y + 0.1f / PPM, 0);
+        }
     }
 
     @Override
@@ -91,8 +101,13 @@ public class Play extends GameState {
         handleInput();
         world.step(dt, 6, 2);
         player.update(dt);
+        player.updateAnimation();
         for (int i = 0; i < bgs.length; i++) {
+            if(!shouldPauseAnimation)
             bgs[i].update(dt);
+        }
+        for (Obstacle o : obstacles) {
+            o.update(dt);
         }
         createObstacle(dt);
         removeObstacles();
@@ -151,14 +166,12 @@ public class Play extends GameState {
         fixtureDef.shape = shape;
         playerBody.createFixture(fixtureDef).setUserData("feet");
 
-
         shape.setAsBox(2 / PPM, 2 / PPM, new Vector2(10 / PPM, 2 / PPM), 0);
         fixtureDef.isSensor = true;
         fixtureDef.shape = shape;
         playerBody.createFixture(fixtureDef).setUserData("player_front");
 
         player = new Player(playerBody);
-
     }
 
     public void createTiles() {
@@ -167,7 +180,6 @@ public class Play extends GameState {
         tilemapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
         TiledMapTileLayer terrainLayer = (TiledMapTileLayer) tiledMap.getLayers().get("terrain");
         createLayers(terrainLayer);
-
     }
 
     public void createLayers(TiledMapTileLayer layer) {
@@ -216,7 +228,7 @@ public class Play extends GameState {
             body.createFixture(fixtureDef).setUserData("obs");
 
             fixtureDef.isSensor = true;
-            shape.setAsBox(11 / PPM, 13 / PPM, new Vector2(-5 / PPM, 5 / PPM), 0);
+            shape.setAsBox(11 / PPM, 13 / PPM, new Vector2(-2 / PPM, 0 / PPM), 0);
             fixtureDef.shape = shape;
             body.createFixture(fixtureDef).setUserData("obs_front");
 
@@ -231,7 +243,6 @@ public class Play extends GameState {
             if(obstacles.get(i).getPosition().x <= 0) {
                 world.destroyBody(obstacles.get(i).getBody());
                 obstacles.removeIndex(i);
-                System.out.printf("yo");
             }
         }
     }

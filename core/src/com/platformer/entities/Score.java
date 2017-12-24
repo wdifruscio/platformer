@@ -3,6 +3,7 @@ package com.platformer.entities;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.platformer.Game;
 
 
 public class Score {
@@ -26,7 +27,7 @@ public class Score {
 
     public void draw(SpriteBatch sb) {
         sb.begin();
-        font.draw(sb, String.valueOf(score), 100, 100);
+        font.draw(sb, String.valueOf(score), Game.WIDTH - 25, Game.HEIGHT -5);
         sb.end();
     }
 }

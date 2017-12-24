@@ -4,10 +4,11 @@ public class GameInput {
     public static boolean[] keys;
     public static boolean[] pkeys;
 
-    public static final int NUM_KEYS = 3;
+    public static final int NUM_KEYS = 4;
     public static final int JUMP = 0;
     public static final int LEFT = 1;
     public static final int RIGHT = 2;
+    public static final int DOWN = 3;
 
 
 

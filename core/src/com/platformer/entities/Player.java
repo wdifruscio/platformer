@@ -7,13 +7,31 @@ import com.platformer.Game;
 
 public class Player extends B2DSprite {
     TextureRegion[] walkRegion;
-    TextureRegion[] idle;
+    TextureRegion[] dodge;
+    private boolean isDodging;
 
     public Player(Body body) {
         super(body);
         Texture texture = Game.resources.getTexture("penguin");
         walkRegion = TextureRegion.split(texture, 32, 32)[1];
-//        idle = TextureRegion.split(texture, 32,32)[0];
+        dodge = TextureRegion.split(texture, 32,32)[2];
         setAnimation(walkRegion, 1/10f);
+    }
+
+    public void updateAnimation() {
+        if(!isDodging) {
+            if(getAnimation().getTimesPlayed() > 0) {
+                setAnimation(walkRegion, 1/10f);
+            }
+        } else {
+            setAnimation(dodge, 1/1000f);
+        }
+    }
+
+    public void setIsDodging(boolean isDodging) {
+        this.isDodging = isDodging;
+    }
+    public boolean getIsDodging() {
+        return this.isDodging;
     }
 }

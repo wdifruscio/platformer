@@ -14,6 +14,9 @@ public class InputProcessor extends InputAdapter {
 
         if(keycode == Input.Keys.RIGHT)
             GameInput.setKey(GameInput.RIGHT, true);
+
+        if(keycode == Input.Keys.DOWN)
+            GameInput.setKey(GameInput.DOWN, true);
         return true;
 
     }
@@ -27,6 +30,9 @@ public class InputProcessor extends InputAdapter {
 
         if(keycode == Input.Keys.RIGHT)
             GameInput.setKey(GameInput.RIGHT, false);
+
+        if(keycode == Input.Keys.DOWN)
+            GameInput.setKey(GameInput.DOWN, false);
 
         return true;
     }
