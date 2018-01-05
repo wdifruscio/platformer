@@ -8,7 +8,7 @@ import com.platformer.Game;
 
 public class Score {
     BitmapFont font;
-    private int score;
+    private int score = 1;
     private float counter = 0;
     private static float RESET = 0.05f;
 
@@ -24,6 +24,8 @@ public class Score {
             counter = 0;
         }
     }
+
+    public int getScore() { return score; }
 
     public void draw(SpriteBatch sb) {
         sb.begin();
